@@ -20,8 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrandr2 libxkbcommon0 \
     # Dependencias base para tipografía
     fontconfig fonts-liberation \
+    # NUEVO: Ecosistema de códecs para reproducción de video en Firefox
+    ffmpeg libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
     && rm -rf /var/lib/apt/lists/*
-
 # 2. ENTORNO VIRTUAL DE PYTHON (Cumplimiento de PEP 668 en Ubuntu)
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
@@ -30,6 +32,12 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # 3. INSTALACIÓN DE CAMOUFOX Y HERRAMIENTAS NATIVAS [18]
 # Se especifica la variante [geoip] recomendada encarecidamente para proxy
 RUN pip install --no-cache-dir -U "camoufox[geoip]" python-dotenv
+
+# PARCHE DE ESTABILIDAD COMPLETO: Corrige el bug de Playwright 1.60.0 (url, lineNumber, columnNumber)
+RUN find /opt/venv -name "coreBundle.js" -exec sed -i \
+    -e "s/pageError.location.url/pageError.location?.url || ''/g" \
+    -e "s/pageError.location.lineNumber/pageError.location?.lineNumber || 0/g" \
+    -e "s/pageError.location.columnNumber/pageError.location?.columnNumber || 0/g" {} +
 
 # El comando 'fetch' de Camoufox descarga el binario parcheado del motor Gecko
 # los modelos estadísticos de BrowserForge y los Addons por defecto [18, 19]

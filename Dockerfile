@@ -39,7 +39,7 @@ RUN camoufox fetch
 # Para evitar el rechazo masivo por inconsistencia de métricas de fuentes [3, 5],
 # el directorio local 'fonts/' provisto por el operador debe contener los archivos.ttf
 RUN mkdir -p /usr/local/share/fonts/camoufox_fonts
-COPY./fonts/ /usr/local/share/fonts/camoufox_fonts/
+COPY ./fonts/ /usr/local/share/fonts/camoufox_fonts/
 # Forzar la reindexación de la caché de fuentes del sistema operativo 
 RUN fc-cache -f -v
 
@@ -47,7 +47,7 @@ RUN fc-cache -f -v
 WORKDIR /app
 COPY src/ /app/src/
 COPY main.py /app/main.py
-COPY.env /app/.env
+COPY .env /app/.env
 
 # 6. CONFIGURACIÓN DEL ORQUESTADOR DE PROCESOS (Supervisor)
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
